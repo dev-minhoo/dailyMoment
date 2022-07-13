@@ -2,17 +2,13 @@ plugins {
 	id 'org.springframework.boot' version '2.7.1'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
+	id 'war'
 }
-
+compileJava.options.encoding = "UTF-8"
 group = 'com.cNerds.dailyMoment'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
-
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-}
+targetCompatibility = '11'
 
 repositories {
 	mavenCentral()
@@ -20,17 +16,17 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.2'
-	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'mysql:mysql-connector-java'
-	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	// Swagger2
-	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+	// swagger
+	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'	
 	implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
-	
+	implementation group: 'org.springframework', name: 'spring-web', version: '5.1.1.RELEASE'
+
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+war {    
+archiveName 'dailyMoment.war' // study(프로젝트명)/build/lib/ROOT.war
 }

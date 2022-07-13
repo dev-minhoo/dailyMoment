@@ -1,0 +1,174 @@
+<beans xmlns="http://www.springframework.org/schema/beans" 
+		xmlns:context="http://www.springframework.org/schema/context" 
+		xmlns:mvc="http://www.springframework.org/schema/mvc" 
+		xmlns:p="http://www.springframework.org/schema/p" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/context
+			http://www.springframework.org/schema/context/spring-context.xsd
+			http://www.springframework.org/schema/mvc
+			http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+	<!-- Enables the Spring MVC @Controller programming model -->
+	<mvc:annotation-driven>
+	</mvc:annotation-driven>
+	
+	<context:component-scan base-package="com.cNerds">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
+	</context:component-scan>
+	
+	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
+	<mvc:resources mapping="/resources/**" location="/resources/" />
+	
+	<!-- <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>classpath:message/message-common</value>
+			</list>
+		</property>
+		<property name="cacheSeconds">
+			<value>60</value>
+		</property>
+		<property name="fallbackToSystemLocale" value="false"/>
+	</bean> -->
+	
+	<!-- 사용자 인증여부 체크 interceptor -->
+	<!-- <mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<mvc:exclude-mapping path="/resources/**"/>
+			<mvc:exclude-mapping path="/download/**"/>
+			<mvc:exclude-mapping path="/async/**"/>
+			<bean id="extCheckInterceptor" class="com.imgtech.core.web.servlet.handler.CheckExtHandlerInterceptor" />
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/account/login.do" />
+			<mvc:mapping path="/mobile/account/login.do" />
+			<mvc:mapping path="/mngr/lab/info/main.do" />
+			<mvc:mapping path="/ushm/msds/search.do" />
+			<mvc:mapping path="/ushm/board/sftyArchv/main.do" />
+			<mvc:mapping path="/ushm/board/sftyArchv/detail.do" />
+			<mvc:mapping path="/ushm/board/accidents/main.do" />
+			<mvc:mapping path="/ushm/board/notice/main.do" />
+			<mvc:mapping path="/ushm/board/notice/detail.do" />
+			<mvc:mapping path="/ushm/board/qna/detailQA.do" />
+			<mvc:mapping path="/ushm/board/qna/main.do" />
+			<mvc:mapping path="/ushm/sftyMtrls/main.do" />
+			<bean id="csrfInterceptor" class="com.imgtech.core.web.servlet.handler.CSRFHandlerInterceptor" />
+		</mvc:interceptor>	
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<mvc:exclude-mapping path="/resources/**"/>
+			<mvc:exclude-mapping path="/download/**"/>
+			<mvc:exclude-mapping path="/API/**"/>			
+			<bean id="loginCheckInterceptor" class="com.imgtech.core.web.servlet.handler.LoginCheckInterceptor" />
+		</mvc:interceptor>
+	</mvc:interceptors> -->
+	
+	<!-- <bean name="requestDataValueProcessor" class="com.imgtech.core.web.servlet.handler.CSRFRequestDataValueProcessor"></bean> -->
+	
+	<!-- S:Normal 
+	<bean class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+		<property name="order" value="1" />
+		<property name="prefix" value="/WEB-INF/views/" />
+		<property name="suffix" value=".jsp" />
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+	 </bean>
+	E:Normal -->
+	 
+	 <!-- S:ContentNegotiatingViewResolver -->
+	 <!-- <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+		<property name="order" value="1" />
+		<property name="contentNegotiationManager">
+			<bean class="org.springframework.web.accept.ContentNegotiationManager">
+				<constructor-arg>
+					<bean class="org.springframework.web.accept.PathExtensionContentNegotiationStrategy">
+						<constructor-arg>
+							<map>
+								<entry key="html" value="text/html" />
+								<entry key="json" value="application/json" />
+								<entry key="xml" value="application/xml" />
+							</map>
+						</constructor-arg>
+					</bean>
+				</constructor-arg>
+			</bean>
+		</property> 
+    
+		 <property name="viewResolvers">
+			<list>
+				<bean class="org.springframework.web.servlet.view.XmlViewResolver">
+			       <property name="location">
+			          <value>/WEB-INF/config/springmvc/spring-pdf-views.xml</value>
+			       </property>
+			    </bean>
+    
+				Tiles View 
+				<bean class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+					<property name="viewClass" value="org.springframework.web.servlet.view.tiles3.TilesView" />
+				</bean>
+				<bean class="org.springframework.web.servlet.view.BeanNameViewResolver">
+					<property name="order" value="0" />
+				</bean>
+			</list>
+		</property>
+		
+		<property name="defaultViews">
+			<list>
+				 JSON View
+				<bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView"/>
+			</list>
+		</property> 
+	</bean>-->
+	 
+	<!-- <bean id="tilesConfigurer" class="org.springframework.web.servlet.view.tiles3.TilesConfigurer">
+        <property name="definitions">
+            <list>
+                 <value>/WEB-INF/tiles/tiles-layout.xml</value>
+            </list>
+        </property>
+    </bean> -->
+	<!-- E:ContentNegotiatingViewResolver -->
+	
+	<!-- Tiles와 혼용해서 쓰면 복잡도가 너무 높아지므로 사용하지 않는다. -->
+	
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/"/>
+		<property name="suffix" value=".jsp"/>
+	</bean>
+	
+	
+	<!-- <bean id="json2text" class="com.imgtech.core.web.servlet.view.json.CustomMappingJacksonJsonView">
+	</bean>
+	
+	<bean id="Tempkey" class="com.imgtech.core.util.Tempkey">
+	</bean>
+	
+	<bean id="download" class="com.imgtech.core.web.servlet.view.MultipartFileView">
+		<property name="download" value="true"/>
+		<property name="multipartFileHandler" ref="multipartFileHandler"/>
+	</bean>
+	<bean id="stream" class="com.imgtech.core.web.servlet.view.MultipartFileView">
+		<property name="download" value="false"/>
+		<property name="multipartFileHandler" ref="multipartFileHandler"/>
+	</bean>
+	<bean id="downloadRes" class="com.imgtech.core.web.servlet.view.ContentsFileView">
+		<property name="contentsFileHandler" ref="contentsFileHandler"/>
+	</bean>
+	<bean id="excelView" class="com.imgtech.core.web.servlet.view.ExcelView" scope="request"/>
+	<bean id="excelView2" class="com.imgtech.core.web.servlet.view.ExcelView2" scope="request"/>
+	<bean id="excelView3" class="com.imgtech.core.web.servlet.view.ExcelView3" scope="request"/>
+	<bean id="massExcelView" class="com.imgtech.core.web.servlet.view.MassExcelView" scope="request"/>
+	<bean id="excelViewMultiSheet" class="com.imgtech.core.web.servlet.view.ExcelViewMultiSheet" scope="request"/>
+	<bean id="pdfUtils" class="com.imgtech.core.util.PDFUtils">
+		<property name="multipartFileHandler" ref="multipartFileHandler"/>
+	</bean>
+	<bean id="pdfView" class="com.imgtech.core.web.servlet.view.PdfView">
+		<property name="multipartFileHandler" ref="multipartFileHandler"/>
+		<property name="pdfUtils" ref="pdfUtils"/>
+	</bean>
+	
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/> -->
+</beans>

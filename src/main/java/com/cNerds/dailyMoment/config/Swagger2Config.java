@@ -1,4 +1,4 @@
-package com.cNerds.dailyMoment.swagger;
+package com.cNerds.dailyMoment.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,27 +11,24 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-@EnableSwagger2
+//http://localhost:8080/swagger-ui.html#
+
 @Configuration
+@EnableSwagger2
 public class Swagger2Config {
+    private ApiInfo apiInfo() {
+        return new ApiInfoBuilder()
+                .title("TEST")
+                .description("FIRST API")
+                .build();
+    }
 
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .apiInfo(apiInfo())
-                .select()
-                .apis(RequestHandlerSelectors.basePackage("com.cNerds.dailyMoment"))
-                .paths(PathSelectors.any())
-                .build();
-    }
-
-    private ApiInfo apiInfo() {
-        return new ApiInfoBuilder()
-                .title("제목 작성")
-                .version("버전 작성")
-                .description("설명 작성")
-                .license("라이센스 작성")
-                .licenseUrl("라이센스 URL 작성")
-                .build();
+                .groupName("example")
+                .apiInfo(this.apiInfo()).select()
+                .apis(RequestHandlerSelectors.basePackage("com.example.backend.controller"))//controller package name
+                .paths(PathSelectors.ant("/api/**")).build();
     }
 }

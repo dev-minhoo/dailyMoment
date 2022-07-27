@@ -9,7 +9,7 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/user/")
 public class UserController {
 
-	@RequestMapping(method = RequestMethod.GET, path = "signUp") 
+	@RequestMapping(method = RequestMethod.POST, path = "signUp") 
     public String signUp(){
 		return  "signUp";    
 		}

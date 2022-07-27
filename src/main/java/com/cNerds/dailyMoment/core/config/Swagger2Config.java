@@ -1,4 +1,4 @@
-package com.cNerds.dailyMoment.config;
+package com.cNerds.dailyMoment.core.config;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;

@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Component
 public class JwtTokenProvider {
-    private String secretKey = "myprojectsecret";
+    private String secretKey = "cNerdsDailyMomentSecretKey";
 
     // 토큰 유효시간 30분
     private long tokenValidTime = 30 * 60 * 1000L;

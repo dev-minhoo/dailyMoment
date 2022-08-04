@@ -45,6 +45,12 @@ dependencies {
 	// JWT TOKEN
 	implementation 'io.jsonwebtoken:jjwt:0.9.1'
 	
+	// mybatis
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.0'
+	
+	// gJson
+	implementation group: 'com.google.code.gson', name: 'gson', version: '2.7'
+	
 
 }
 

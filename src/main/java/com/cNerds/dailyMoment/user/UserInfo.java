@@ -2,18 +2,18 @@ package com.cNerds.dailyMoment.user;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import org.apache.ibatis.mapping.FetchType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import lombok.Builder;
+import com.cNerds.dailyMoment.core.entity.EntityInfoImpl;
 
-public class UserInfo implements UserDetails {
-
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class UserInfo extends EntityInfoImpl implements UserDetails {
 	
 	private int userNo;
 	private String userId;
@@ -22,8 +22,8 @@ public class UserInfo implements UserDetails {
 	private String userNickName;
 	private String isAgree;
 	private String isSocial;
+	private String userAuthToken;
 	private String isDelete;
-	private String role;
 
 	@Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

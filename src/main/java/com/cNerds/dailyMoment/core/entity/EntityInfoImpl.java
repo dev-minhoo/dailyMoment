@@ -2,8 +2,11 @@ package com.cNerds.dailyMoment.core.entity;
 
 import java.util.Date;
 
-import com.cNerds.dailyMoment.user.UserInfo;
+import com.cNerds.dailyMoment.user.dto.UserInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 public class EntityInfoImpl implements EntityInfo {
 

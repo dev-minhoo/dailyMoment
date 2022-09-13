@@ -1,16 +1,15 @@
 package com.cNerds.dailyMoment.user.dao;
 
-import org.springframework.stereotype.Repository;
+import com.cNerds.dailyMoment.core.dao.GenericDao;
+import com.cNerds.dailyMoment.user.dto.UserInfo;
+import com.cNerds.dailyMoment.user.dto.UserInfoCriterion;
 
-import com.cNerds.dailyMoment.core.dao.myBatis.MyBatisGenericDao;
-import com.cNerds.dailyMoment.user.UserInfo;
-import com.cNerds.dailyMoment.user.UserInfoCriterion;
+public interface UserInfoDao extends GenericDao<UserInfo, UserInfoCriterion> {
 
-@Repository
-public class UserInfoDao extends MyBatisGenericDao<UserInfo, UserInfoCriterion> {
-	
-	public UserInfoDao() {
-		super(UserInfo.class);
-	}
-	
+	UserInfo authCheckDetail(String username);
+
+	UserInfo refreshTokenCheck(String refreshAuthToken);
+
+	void updateAuthToken(UserInfo tokenUserInfo);
+	 
 }

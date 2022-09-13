@@ -2,7 +2,10 @@ package com.cNerds.dailyMoment.core.entity;
 
 import java.util.Date;
 
-import com.cNerds.dailyMoment.user.UserInfo;
+import com.cNerds.dailyMoment.user.dto.UserInfo;
+
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 public interface EntityInfo {
     public Date getCreateOn();

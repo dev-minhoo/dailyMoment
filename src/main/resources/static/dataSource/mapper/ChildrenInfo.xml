@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.cNerds.dailyMoment.children.dto.ChildrenInfo">
+	
+	<!-- ============================================================= -->
+	<!-- resultMap                                                     -->
+	<!-- ============================================================= -->
+	<resultMap type="com.cNerds.dailyMoment.children.dto.ChildrenInfo" id="resultMap">
+		<id property="childrenNo"					column="CHILDREN_NO"/>
+		<result property="familyNo"					column="FAMILY_NO" />
+		<result property="childrenName"				column="CHILDREN_NAME" />
+		<result property="childrenBirth"			column="CHILDREN_BIRTH" />
+		<result property="childrenGender"			column="CHILDREN_GENDER" />
+		<result property="weight"					column="WEIGHT" />
+		<result property="height"					column="HEIGHT" />
+		<result property="newBornBabyName"			column="NEW_BORN_BABY_NAME" />
+		<result property="imageName"				column="IMAGE_NAME" />
+		<result property="createOn" 				column="CREATE_ON"/>
+		<result property="creator.userNo" 			column="CREATOR"/>
+		<result property="modifiedOn" 				column="MODIFIED_ON"/>
+		<result property="modifier.userNo" 			column="MODIFIER"/>
+	</resultMap>
+	
+	<!-- ============================================================= -->
+	<!-- Query Fragment                                                -->
+	<!-- ============================================================= -->
+	<sql id="columns">
+		CDI.CHILDREN_NO, CDI.FAMILY_NO, CDI.CHILDREN_NAME, CDI.CHILDREN_BIRTH, CDI.CHILDREN_GENDER,
+		CDI.WEIGHT, CDI.HEIGHT, CDI.NEW_BORN_BABY_NAME, CDI.IMAGE_NAME,
+		CDI.CREATE_ON, CDI.CREATOR, CDI.MODIFIED_ON, CDI.MODIFIER
+  	    
+	</sql>
+	<sql id="tables">
+		B_CHILDREN_INFO CDI 
+	</sql>
+	<sql id="keyCriterion">
+		CDI.CHILDREN_NO = #{childrenNo}
+	</sql>
+	
+	<sql id="searchCriterion">
+			
+	</sql>
+	<sql id="searchOrder">
+		CDI.CHILDREN_NO DESC
+	</sql>
+	
+	<!-- ============================================================= -->
+	<!-- Search                                                        -->
+	<!-- ============================================================= -->
+	
+	 <select id="list" parameterType="com.cNerds.dailyMoment.children.dto.ChildrenInfoCriterion" resultMap ="resultMap">
+		SELECT <include refid="columns"/>
+		FROM <include refid="tables"/>
+		<where>
+			<include refid="searchCriterion"/>
+		</where>
+		ORDER BY <include refid="searchOrder"/>		
+	</select>
+	
+	<select id="detail" parameterType="com.cNerds.dailyMoment.children.dto.ChildrenInfo" resultMap ="resultMap">
+		SELECT <include refid="columns"/>
+		FROM <include refid="tables"/>
+		<where>
+			<include refid="keyCriterion"/>
+		</where>
+	</select>
+	
+	<select id="searchMaxChildrenNo" resultType ="Integer">
+		SELECT IFNULL(MAX(CHILDREN_NO),0)
+		FROM
+		 	B_CHILDREN_INFO
+	</select>
+
+	<!-- ============================================================= -->
+	<!-- Insert / Update / Delete                                      -->
+	<!-- ============================================================= -->
+	<insert id="insert" parameterType="com.cNerds.dailyMoment.children.dto.ChildrenInfo">
+		<selectKey keyProperty="childrenNo" resultType="Integer" order="BEFORE"> 
+			SELECT IFNULL(MAX(CHILDREN_NO), 0)+1 childrenNo FROM B_CHILDREN_INFO
+		</selectKey>
+		 
+		INSERT INTO B_CHILDREN_INFO
+		(
+			CHILDREN_NO
+			, FAMILY_NO
+			, CHILDREN_NAME
+			, CHILDREN_BIRTH
+			, CHILDREN_GENDER
+			, WEIGHT
+			, HEIGHT
+			, NEW_BORN_BABY_NAME
+			, IMAGE_NAME
+			, CREATE_ON
+			, CREATOR
+						
+			
+		)
+		VALUES
+		(
+			#{childrenNo}			
+			, #{familyNo}
+			, #{childrenName}
+			, #{childrenBirth}
+			, #{childrenGender}
+			, #{weight}
+			, #{height}
+			, #{newBornBabyName}
+			, #{imageName}
+			, NOW()			
+			, #{creator.userNo}					
+		)
+	</insert>
+		
+	<update id="update" parameterType="com.cNerds.dailyMoment.children.dto.ChildrenInfo">
+		UPDATE 
+			B_CHILDREN_INFO CDI
+		SET
+			FAMILY_NO					=			#{familyNo}
+			, CHILDREN_NAME				=			#{childrenName}
+			, CHILDREN_BIRTH			=			#{childrenBirth}
+			, CHILDREN_GENDER			=			#{childrenGender}
+			, WEIGHT					=			#{weight}
+			, HEIGHT					=			#{height}
+			, NEW_BORN_BABY_NAME		=			#{newBornBabyName}
+			, IMAGE_NAME				=			#{imageName}
+			, MODIFIED_ON				=			NOW()
+			, MODIFIER					=			#{modifier.userNo}
+		<where>
+		 <include refid="keyCriterion"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="com.cNerds.dailyMoment.children.dto.ChildrenInfo">
+		DELETE FROM CDI USING B_CHILDREN_INFO CDI
+			<where>
+		 	<include refid="keyCriterion"/>
+		 </where>
+	</delete>
+	
+	
+	
+	
+	
+	
+</mapper>

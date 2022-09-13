@@ -13,25 +13,25 @@ import com.cNerds.dailyMoment.core.dao.GenericDao;
 import com.cNerds.dailyMoment.core.entity.EntityCriterion;
 import com.cNerds.dailyMoment.core.entity.EntityInfo;
 import com.cNerds.dailyMoment.core.util.ApplicationContextUtils;
-import com.cNerds.dailyMoment.user.UserInfo;
+import com.cNerds.dailyMoment.user.dto.UserInfo;
 
 public abstract class GenericServiceImpl<T extends EntityInfo, C extends EntityCriterion, D extends GenericDao<T, C>> 
-        implements GenericService<T, C, D>, ApplicationContextAware, InitializingBean {
+implements GenericService<T, C, D>, ApplicationContextAware, InitializingBean{
 
     protected Log logger = LogFactory.getLog(getClass());
-
+    
     private ApplicationContext applicationContext;
-
+    
     protected Class<D> daoClass;
     protected D dao;
-
+    
     public GenericServiceImpl() {
     }
 
     protected GenericServiceImpl(Class<D> daoClass) {
         this.daoClass = daoClass;
     }
-
+    
     /*
      * ApplicationContextAware interface implementation.
      */
@@ -52,6 +52,7 @@ public abstract class GenericServiceImpl<T extends EntityInfo, C extends EntityC
      * 로그인 정보 셋팅
      */
     public void settingEntity(T entity , UserInfo loginUserInfo) {
+    	
         try{
             entity.setCreator(loginUserInfo);// 로그인정보
             entity.setModifier(loginUserInfo);// 로그인정보
@@ -63,28 +64,20 @@ public abstract class GenericServiceImpl<T extends EntityInfo, C extends EntityC
     @Override
     public void insert(T entity ,UserInfo loginUserInfo) {
         settingEntity(entity,loginUserInfo);
+        
+        System.out.println();
         dao.insert(entity);
     }
 
     @Override
     public void update(T entity ,UserInfo loginUserInfo) {
     	settingEntity(entity ,loginUserInfo);
-        dao.update(entity);
+    	dao.update(entity);
     }
 
     @Override
     public int delete(T entity) {
         return dao.delete(entity);
-    }
-    
-    @Override
-    public boolean exist(T entity) {
-        return dao.exist(entity);
-    }
-
-    @Override
-    public long listCount(C criterion) {
-        return dao.listCount(criterion);
     }
     
     @Override

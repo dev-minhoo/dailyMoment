@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.cNerds.dailyMoment.familyMember.dto.FamilyMemberInfo">
+	
+	<!-- ============================================================= -->
+	<!-- resultMap                                                     -->
+	<!-- ============================================================= -->
+	<resultMap type="com.cNerds.dailyMoment.familyMember.dto.FamilyMemberInfo" id="resultMap">
+		<id property="familyMemberNo"				column="FAMILY_MEMBER_NO"/>
+		<result property="familyNo"					column="FAMILY_NO" />
+		<result property="userNo"					column="USER_NO"/>
+		<result property="familyRelation"			column="FAMILY_RELATION"/>
+		<result property="isFamilyAdmin"			column="IS_FAMILY_ADMIN" />
+		<result property="isFamilyAgree"			column="IS_FAMILY_AGREE" />
+		<result property="createOn" 				column="CREATE_ON"/>
+		<result property="creator.userNo" 			column="CREATOR"/>
+		<result property="modifiedOn" 				column="MODIFIED_ON"/>
+		<result property="modifier.userNo" 			column="MODIFIER"/>
+	</resultMap>
+	
+	<!-- ============================================================= -->
+	<!-- Query Fragment                                                -->
+	<!-- ============================================================= -->
+	<sql id="columns">
+		FMI.FAMILY_MEMBER_NO, FMI.FAMILY_NO, FMI.USER_NO,
+		FMI.FAMILY_RELATION, FMI.IS_FAMILY_ADMIN, FMI.IS_FAMILY_AGREE,		
+		FMI.CREATE_ON, FMI.CREATOR, FMI.MODIFIED_ON, FMI.MODIFIER	    
+	</sql>
+	<sql id="tables">
+		B_FAMILY_MEMBER_INFO FMI
+		JOIN B_USER_INFO UI ON FMI.USER_NO = UI.USER_NO		
+	</sql>
+	<sql id="keyCriterion">
+		FMI.FAMILY_MEMBER_NO = #{familyMemberNo}
+	</sql>
+	
+	<sql id="searchCriterion">
+		<if test="searchFamilyNo != null">
+			AND FMI.FAMILY_NO = #{searchFamilyNo}
+		</if>
+		<if test="searchUserNo != null">
+			AND FMI.USER_NO = #{searchUserNo}
+		</if>
+		<if test="searchUserId != null and searchUserId != ''">
+			AND UI.USER_ID = #{searchUserId}
+		</if>
+		<if test="searchIsFamilyAdmin != null">
+			AND FMI.IS_FAMILY_ADMIN = #{searchIsFamilyAdmin}
+		</if>
+		<if test="searchIsFamilyAgree != null ">
+			AND FMI.IS_FAMILY_AGREE = #{searchIsFamilyAgree}
+		</if>	
+	</sql>
+	<sql id="searchOrder">
+		FMI.FAMILY_MEMBER_NO DESC
+	</sql>
+	
+	<!-- ============================================================= -->
+	<!-- Search                                                        -->
+	<!-- ============================================================= -->
+	
+	 <select id="list" parameterType="com.cNerds.dailyMoment.familyMember.dto.FamilyMemberInfoCriterion" resultMap ="resultMap">
+		SELECT <include refid="columns"/>
+		FROM <include refid="tables"/>
+		<where>
+			<include refid="searchCriterion"/>
+		</where>
+		ORDER BY <include refid="searchOrder"/>		
+	</select>
+	
+	<select id="detail" parameterType="com.cNerds.dailyMoment.familyMember.dto.FamilyMemberInfo" resultMap ="resultMap">
+		SELECT <include refid="columns"/>
+		FROM <include refid="tables"/>
+		<where>
+			<include refid="keyCriterion"/>
+		</where>
+	</select>
+	
+	<select id="familyMemberAuthCheck" parameterType="com.cNerds.dailyMoment.familyMember.dto.FamilyMemberInfo" resultMap ="resultMap">
+		SELECT <include refid="columns"/>
+		FROM <include refid="tables"/>
+		<where>
+			FMI.USER_NO = #{userNo}
+			AND FMI.FAMILY_NO = #{familyNo}
+			<if test="isFamilyAdmin != null and isFamilyAdmin != 0">
+				AND FMI.IS_FAMILY_ADMIN = #{isFamilyAdmin}
+			</if>
+			AND FMI.IS_FAMILY_AGREE = 1
+		</where>
+	</select>  
+
+	<!-- ============================================================= -->
+	<!-- Insert / Update / Delete                                      -->
+	<!-- ============================================================= -->
+	<insert id="insert" parameterType="com.cNerds.dailyMoment.familyMember.dto.FamilyMemberInfo">
+		<selectKey keyProperty="familyMemberNo" resultType="Integer" order="BEFORE"> 
+			SELECT IFNULL(MAX(FAMILY_MEMBER_NO), 0)+1 familyMemberNo FROM B_FAMILY_MEMBER_INFO 
+		</selectKey>
+		 
+		INSERT INTO B_FAMILY_MEMBER_INFO
+		(
+			FAMILY_MEMBER_NO
+			, FAMILY_NO
+			, USER_NO
+			, FAMILY_RELATION
+			, IS_FAMILY_ADMIN
+			, IS_FAMILY_AGREE
+			, CREATE_ON
+			, CREATOR
+						
+			
+		)
+		VALUES
+		(
+			#{familyMemberNo}			
+			, #{familyNo}	
+			, #{userNo}
+			, #{familyRelation}
+			, #{isFamilyAdmin}
+			, #{isFamilyAgree}		
+			, NOW()			
+			, #{creator.userNo}					
+		)
+	</insert>
+		
+	<update id="update" parameterType="com.cNerds.dailyMoment.familyMember.dto.FamilyMemberInfo">
+		UPDATE 
+			B_FAMILY_MEMBER_INFO FMI
+		SET
+			FAMILY_NO					=			#{familyName}
+			, USER_NO					=			#{userNo}
+			, FAMILY_RELATION			=			#{familyRelation}
+			, IS_FAMILY_ADMIN			=			#{isFamilyAdmin}
+			, IS_FAMILY_AGREE			=			#{isFamilyAgree}
+			, MODIFIED_ON				=			NOW()
+			, MODIFIER					=			#{modifier.userNo}
+		<where>
+		 <include refid="keyCriterion"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="com.cNerds.dailyMoment.familyMember.dto.FamilyMemberInfo">
+		DELETE FROM FMI USING B_FAMILY_MEMBER_INFO FMI
+			<where>
+		 	<include refid="keyCriterion"/>
+		 </where>
+	</delete>
+	
+	
+	
+	
+	
+	
+</mapper>

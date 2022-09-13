@@ -1,0 +1,51 @@
+
+
+spring:
+  datasource:    
+    hikari:
+      #driver-class-name: com.mysql.jdbc.Driver
+      driver-class-name : net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+      password: 1234Qwer!@#
+      jdbc-url: jdbc:log4jdbc:mysql://localhost:3306/DAILY_MOMENT_DEB_TEST?useSSL=false&allowPublicKeyRetrieval=true&autoReconnect=true&useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Seoul
+      username: root
+      connection-timeout: 3000
+      validation-timeout: 3000
+      minimum-idle: 5
+      max-lifetime: 240000
+      maximum-pool-size: 20
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    show-sql: true
+  mybatis :
+    configuration:
+      map-underscore-to-camel-case : true
+  mvc:
+    converters:
+      preferred-json-mapper: gson
+  thymeleaf:
+    cache: false
+    check-template-location: true
+    prefix: classpath:/templates/
+    suffix: .html
+    encoding : UTF-8
+  file:
+    upload:
+      location: D:/resources/images/
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  mail :
+    default-encoding : UTF-8
+    host : smtp.naver.com
+    port : 587
+    username : 
+    password :  
+    properties : 
+      mail : 
+        smtp :
+          auth: true
+          starttls: true
+        debug : true
+        mime : UTF-8 
+        transport : smtp

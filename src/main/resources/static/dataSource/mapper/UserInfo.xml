@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.cNerds.dailyMoment.user.dto.UserInfo">
+	
+	<!-- ============================================================= -->
+	<!-- resultMap                                                     -->
+	<!-- ============================================================= -->
+	<resultMap type="com.cNerds.dailyMoment.user.dto.UserInfo" id="resultMap">
+		<id property="userNo"					column="USER_NO"/>
+		<result property="userId"				column="USER_ID" />
+		<result property="userPwd"				column="USER_PWD" />
+		<result property="userName"				column="USER_NAME" />
+		<result property="userNickName"			column="USER_NICK_NAME" />
+		<result property="isAgree"				column="IS_AGREE" />
+		<result property="isSocial"				column="IS_SOCIAL" />
+		<result property="userAuthCheckToken"	column="USER_AUTH_CHECK_TOKEN" />
+		<result property="imageName"			column="IMAGE_NAME" />
+		<result property="createOn" 			column="CREATE_ON"/>
+		<result property="creator.userNo" 		column="CREATOR"/>
+		<result property="modifiedOn" 			column="MODIFIED_ON"/>
+		<result property="modifier.userNo" 		column="MODIFIER"/>
+	</resultMap>
+	
+	<!-- ============================================================= -->
+	<!-- Query Fragment                                                -->
+	<!-- ============================================================= -->
+	<sql id="columns">
+		UI.USER_NO, UI.USER_ID, UI.USER_PWD, UI.USER_NAME, UI.USER_NICK_NAME,
+		UI.IS_AGREE, UI.IS_SOCIAL, UI.IMAGE_NAME,
+		UI.CREATE_ON, UI.CREATOR, UI.MODIFIED_ON, UI.MODIFIER
+  	    
+	</sql>
+	<sql id="tables">
+		B_USER_INFO UI
+	</sql>
+	<sql id="keyCriterion">
+		UI.USER_NO = #{userNo}
+	</sql>
+	
+	<sql id="searchCriterion">
+		<if test="searchUserId != null and searchUserId != ''">
+			AND UI.USER_ID = #{searchUserId}
+		</if>
+	</sql>
+	<sql id="searchOrder">
+		UI.USER_NO DESC
+	</sql>
+	
+	<!-- ============================================================= -->
+	<!-- Search                                                        -->
+	<!-- ============================================================= -->
+	
+	 <select id="list" parameterType="com.cNerds.dailyMoment.user.dto.UserInfoCriterion" resultMap ="resultMap">
+		SELECT <include refid="columns"/>
+		FROM <include refid="tables"/>
+		<where>
+			<include refid="searchCriterion"/>
+		</where>
+		ORDER BY <include refid="searchOrder"/>		
+	</select>
+	
+	<select id="detail" parameterType="com.cNerds.dailyMoment.user.dto.UserInfo" resultMap ="resultMap">
+		SELECT <include refid="columns"/>
+		FROM <include refid="tables"/>
+		<where>
+			<include refid="keyCriterion"/>
+		</where>
+	</select>
+	
+	<select id="authCheckDetail" parameterType="String" resultMap ="resultMap">
+		SELECT 
+			UI.USER_NO, UI.USER_ID, UI.USER_PWD, UI.USER_NAME, UI.USER_NICK_NAME,
+			UI.IS_AGREE, UI.IS_SOCIAL, UI.USER_AUTH_CHECK_TOKEN
+		FROM <include refid="tables"/>
+		<where>
+			UI.USER_ID = #{userId}
+		</where>
+	</select>  
+	
+	<select id="refreshTokenCheck" parameterType="String" resultMap ="resultMap">
+		SELECT 
+			UI.USER_NO, UI.USER_ID, UI.USER_AUTH_CHECK_TOKEN
+		FROM <include refid="tables"/>
+		<where>
+			UI.USER_AUTH_CHECK_TOKEN = #{userAuthCheckToken}
+		</where>
+	</select>
+
+	<!-- ============================================================= -->
+	<!-- Insert / Update / Delete                                      -->
+	<!-- ============================================================= -->
+	<insert id="insert" parameterType="com.cNerds.dailyMoment.user.dto.UserInfo">
+		<selectKey keyProperty="userNo" resultType="Integer" order="BEFORE"> 
+			SELECT IFNULL(MAX(USER_NO), 0)+1 userNo FROM B_USER_INFO 
+		</selectKey>
+		 
+		INSERT INTO B_USER_INFO
+		(
+			USER_NO
+			, USER_ID
+			, USER_PWD
+			, USER_NAME
+			, USER_NICK_NAME
+			, IS_AGREE
+			, IS_SOCIAL
+			, CREATE_ON
+			, CREATOR
+						
+			
+		)
+		VALUES
+		(
+			#{userNo}			
+			, #{userId}
+			, #{userPwd}
+			, #{userName}
+			, #{userNickName}
+			, #{isAgree}
+			, #{isSocial}
+			, NOW()			
+			, #{userNo}					
+		)
+	</insert>
+		
+	<update id="update" parameterType="com.cNerds.dailyMoment.user.dto.UserInfo">
+		UPDATE 
+			B_USER_INFO UI
+		SET
+			USER_ID					=			#{userId}
+			, USER_PWD				=			#{userPwd}
+			, USER_NAME				=			#{userName}
+			, USER_NICK_NAME		=			#{userNickName}
+			, IS_AGREE				=			#{isAgree}
+			, IS_SOCIAL				=			#{isSocial}
+			, IMAGE_NAME			=			#{imageName}
+			, MODIFIED_ON			=			NOW()
+			, MODIFIER				=			#{modifier.userNo}
+		<where>
+		 <include refid="keyCriterion"/>
+		</where>
+	</update>
+	
+	<update id="updateAuthToken" parameterType="com.cNerds.dailyMoment.user.dto.UserInfo">
+		UPDATE 
+			B_USER_INFO UI
+		SET
+			USER_AUTH_CHECK_TOKEN	=			#{userAuthCheckToken}
+			, MODIFIED_ON			=			NOW()
+			, MODIFIER				=			#{modifier.userNo}
+		<where>
+		 <include refid="keyCriterion"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="com.cNerds.dailyMoment.user.dto.UserInfo">
+		DELETE FROM UI USING B_USER_INFO UI
+			<where>
+		 	<include refid="keyCriterion"/>
+		 </where>
+	</delete>
+		
+</mapper>

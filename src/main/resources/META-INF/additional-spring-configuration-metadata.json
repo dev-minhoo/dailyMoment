@@ -63,5 +63,60 @@
     "name": "password",
     "type": "java.lang.String",
     "description": "A description for 'password'"
+  },
+  {
+    "name": "auto-commit",
+    "type": "java.lang.String",
+    "description": "A description for 'auto-commit'"
+  },
+  {
+    "name": "connection-test-query",
+    "type": "java.lang.String",
+    "description": "A description for 'connection-test-query'"
+  },
+  {
+    "name": "hikari",
+    "type": "java.lang.String",
+    "description": "A description for 'hikari'"
+  },
+  {
+    "name": "minimum-idle",
+    "type": "java.lang.String",
+    "description": "A description for 'minimum-idle'"
+  },
+  {
+    "name": "maximum-pool-size",
+    "type": "java.lang.String",
+    "description": "A description for 'maximum-pool-size'"
+  },
+  {
+    "name": "transaction-isolation",
+    "type": "java.lang.String",
+    "description": "A description for 'transaction-isolation'"
+  },
+  {
+    "name": "pool-name",
+    "type": "java.lang.String",
+    "description": "A description for 'pool-name'"
+  },
+  {
+    "name": "jdbc-url",
+    "type": "java.lang.String",
+    "description": "A description for 'jdbc-url'"
+  },
+  {
+    "name": "mapper-locations",
+    "type": "java.lang.String",
+    "description": "A description for 'mapper-locations'"
+  },
+  {
+    "name": "implementation",
+    "type": "java.lang.String",
+    "description": "A description for 'implementation'"
+  },
+  {
+    "name": "io.springfox",
+    "type": "java.lang.String",
+    "description": "A description for 'io.springfox'"
   }
 ]}

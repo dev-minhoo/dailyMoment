@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.cNerds.dailyMoment.family.dto.FamilyInfo">
+	
+	<!-- ============================================================= -->
+	<!-- resultMap                                                     -->
+	<!-- ============================================================= -->
+	<resultMap type="com.cNerds.dailyMoment.family.dto.FamilyInfo" id="resultMap">
+		<id property="familyNo"						column="FAMILY_NO"/>
+		<result property="familyName"				column="FAMILY_NAME" />
+		<result property="createOn" 				column="CREATE_ON"/>
+		<result property="creator.userNo" 			column="CREATOR"/>
+		<result property="modifiedOn" 				column="MODIFIED_ON"/>
+		<result property="modifier.userNo" 			column="MODIFIER"/>
+	</resultMap>
+	
+	<!-- ============================================================= -->
+	<!-- Query Fragment                                                -->
+	<!-- ============================================================= -->
+	<sql id="columns">
+		FI.FAMILY_NO, FI.FAMILY_NAME,		
+		FI.CREATE_ON, FI.CREATOR, FI.MODIFIED_ON, FI.MODIFIER	    
+	</sql>
+	<sql id="tables">
+		B_FAMILY_INFO FI
+	</sql>
+	<sql id="keyCriterion">
+		FI.FAMILY_NO = #{familyNo}
+	</sql>
+	
+	<sql id="searchCriterion">
+		<if test="familyMemberInfo != null">
+			<if test="familyMemberInfo.userNo != null">
+				AND FAMILY_NO IN (
+					SELECT FAMILY_NO
+					FROM T_FAMILY_MEMBER_INFO
+					WHERE USER_NO = #{familyMemberInfo.userNo}
+				)
+			</if>
+		</if>		
+	</sql>
+	<sql id="searchOrder">
+		FI.FAMILY_NO DESC
+	</sql>
+	
+	<!-- ============================================================= -->
+	<!-- Search                                                        -->
+	<!-- ============================================================= -->
+	
+	 <select id="list" parameterType="com.cNerds.dailyMoment.family.dto.FamilyInfoCriterion" resultMap ="resultMap">
+		SELECT <include refid="columns"/>
+		FROM <include refid="tables"/>
+		<where>
+			<include refid="searchCriterion"/>
+		</where>
+		ORDER BY <include refid="searchOrder"/>		
+	</select>
+	
+	<select id="detail" parameterType="com.cNerds.dailyMoment.family.dto.FamilyInfo" resultMap ="resultMap">
+		SELECT <include refid="columns"/>
+		FROM <include refid="tables"/>
+		<where>
+			<include refid="keyCriterion"/>
+		</where>
+	</select>
+
+	<!-- ============================================================= -->
+	<!-- Insert / Update / Delete                                      -->
+	<!-- ============================================================= -->
+	<insert id="insert" parameterType="com.cNerds.dailyMoment.family.dto.FamilyInfo">
+		<selectKey keyProperty="familyNo" resultType="Integer" order="BEFORE"> 
+			SELECT IFNULL(MAX(FAMILY_NO), 0)+1 familyNo FROM B_FAMILY_INFO 
+		</selectKey>
+		 
+		INSERT INTO B_FAMILY_INFO
+		(
+			FAMILY_NO
+			, FAMILY_NAME
+			, CREATE_ON
+			, CREATOR
+						
+			
+		)
+		VALUES
+		(
+			#{familyNo}			
+			, #{familyName}			
+			, NOW()			
+			, #{creator.userNo}					
+		)
+	</insert>
+		
+	<update id="update" parameterType="com.cNerds.dailyMoment.family.dto.FamilyInfo">
+		UPDATE 
+			B_FAMILY_INFO FI
+		SET
+			FAMILY_NAME					=			#{familyName}
+			, MODIFIED_ON				=			NOW()
+			, MODIFIER					=			#{modifier.userNo}
+		<where>
+		 <include refid="keyCriterion"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="com.cNerds.dailyMoment.family.dto.FamilyInfo">
+		DELETE FROM FI USING B_FAMILY_INFO FI
+			<where>
+		 	<include refid="keyCriterion"/>
+		 </where>
+	</delete>
+	
+	
+	
+	
+	
+	
+</mapper>

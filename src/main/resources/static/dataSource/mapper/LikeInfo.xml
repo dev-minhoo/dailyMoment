@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.cNerds.dailyMoment.like.dto.LikeInfo">
+	
+	<!-- ============================================================= -->
+	<!-- resultMap                                                     -->
+	<!-- ============================================================= -->
+	<resultMap type="com.cNerds.dailyMoment.like.dto.LikeInfo" id="resultMap">
+		<id property="likeNo"					column="LIKE_NO"/>
+		<result property="photoNo"				column="PHOTO_NO" />
+		<result property="replyNo"				column="REPLY_NO" />		
+		<result property="createOn" 			column="CREATE_ON"/>
+		<result property="creator.userNo" 		column="CREATOR"/>
+	</resultMap>
+	
+	<!-- ============================================================= -->
+	<!-- Query Fragment                                                -->
+	<!-- ============================================================= -->
+	<sql id="columns">
+		LI.LIKE_NO, LI.PHOTO_NO, LI.REPLY_NO, 		
+		LI.CREATE_ON, LI.CREATOR
+  	    
+	</sql>
+	<sql id="tables">
+		B_LIKE_INFO LI
+	</sql>
+	<sql id="keyCriterion">
+		LI.LIKE_NO = #{likeNo}
+	</sql>
+	
+	<sql id="searchCriterion">
+		<if test="searchPhotoNo != null and searchPhotoNo != 0">
+			AND LI.PHOTO_NO = #{searchPhotoNo}
+		</if>
+		<if test="searchReplyNo != null and searchReplyNo != 0">
+			AND LI.REPLY_NO = #{searchReplyNo}
+		</if>
+	</sql>
+	<sql id="searchOrder">
+		LI.LIKE_NO DESC
+	</sql>
+	
+	<!-- ============================================================= -->
+	<!-- Search                                                        -->
+	<!-- ============================================================= -->
+	
+	 <select id="list" parameterType="com.cNerds.dailyMoment.like.dto.LikeInfoCriterion" resultMap ="resultMap">
+		SELECT <include refid="columns"/>
+		FROM <include refid="tables"/>
+		<where>
+			<include refid="searchCriterion"/>
+		</where>
+		ORDER BY <include refid="searchOrder"/>		
+	</select>
+	
+	<select id="detail" parameterType="com.cNerds.dailyMoment.like.dto.LikeInfo" resultMap ="resultMap">
+		SELECT <include refid="columns"/>
+		FROM <include refid="tables"/>
+		<where>
+			<include refid="keyCriterion"/>
+		</where>
+	</select>
+ 
+
+	<!-- ============================================================= -->
+	<!-- Insert / Update / Delete                                      -->
+	<!-- ============================================================= -->
+	<insert id="insert" parameterType="com.cNerds.dailyMoment.like.dto.LikeInfo">
+		<selectKey keyProperty="likeNo" resultType="Integer" order="BEFORE"> 
+			SELECT IFNULL(MAX(LIKE_NO), 0)+1 likeNo FROM B_LIKE_INFO 
+		</selectKey>
+		 
+		INSERT INTO B_LIKE_INFO
+		(
+			LIKE_NO
+			, PHOTO_NO
+			, REPLY_NO
+			, CREATE_ON
+			, CREATOR
+						
+			
+		)
+		VALUES
+		(
+			#{likeNo}			
+			, #{photoNo}
+			, #{replyNo}
+			, NOW()			
+			, #{creator.userNo}					
+		)
+	</insert>
+		
+	<update id="update" parameterType="com.cNerds.dailyMoment.like.dto.LikeInfo">
+		UPDATE 
+			B_LIKE_INFO LI
+		SET
+			PHOTO_NO					=			#{photoNo}
+			, REPLY_NO					=			#{replyNo}
+		<where>
+		 <include refid="keyCriterion"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="com.cNerds.dailyMoment.like.dto.LikeInfo">
+		DELETE FROM LI USING B_LIKE_INFO LI
+			<where>
+		 	<include refid="keyCriterion"/>
+		 </where>
+	</delete>
+	
+	
+	
+	
+	
+	
+</mapper>

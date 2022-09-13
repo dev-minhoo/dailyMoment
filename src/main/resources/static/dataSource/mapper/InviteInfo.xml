@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.cNerds.dailyMoment.invite.dto.InviteInfo">
+	
+	<!-- ============================================================= -->
+	<!-- resultMap                                                     -->
+	<!-- ============================================================= -->
+	<resultMap type="com.cNerds.dailyMoment.invite.dto.InviteInfo" id="resultMap">
+		<id property="inviteNo"						column="INVITE_NO"/>
+		<result property="familyNo"					column="FAMILY_NO" />
+		<result property="familyRelation"			column="FAMILY_RELATION" />
+		<result property="email"					column="EMAIL" />
+		<result property="authCode"					column="AUTH_CODE" />
+		<result property="isPermission"				column="IS_PERMISSION" />
+		<result property="isDelete"					column="IS_DELETE" />	
+		<result property="createOn" 				column="CREATE_ON"/>
+		<result property="creator.userNo" 			column="CREATOR"/>
+		<result property="modifiedOn" 				column="MODIFIED_ON"/>
+		<result property="modifier.userNo" 			column="MODIFIER"/>
+	</resultMap>
+	
+	<!-- ============================================================= -->
+	<!-- Query Fragment                                                -->
+	<!-- ============================================================= -->
+	<sql id="columns">
+		II.INVITE_NO, II.FAMILY_NO,
+		II.EMAIL, II.AUTH_CODE,
+		II.IS_PERMISSION, II.IS_DELETE,		 		
+		II.CREATE_ON, II.CREATOR, II.MODIFIED_ON, II.MODIFIER
+  	    
+	</sql>
+	<sql id="tables">
+		B_INVITE_INFO II
+	</sql>
+	<sql id="keyCriterion">
+		II.INVITE_NO = #{inviteNo}
+	</sql>
+	
+	<sql id="searchCriterion">
+		<if test="searchFamilyNo != null">
+			AND II.FAMILY_NO = #{searchFamilyNo}
+		</if>
+		<if test="searchEmail != null and searchEmail != ''">
+			AND II.EMAIL = #{searchEmail}
+		</if>
+		<if test="searchAuthCode != null and searchAuthCode != ''">
+			AND II.AUTH_CODE = #{searchAuthCode}
+		</if>
+		<if test="searchIsPermission != null">
+			AND II.IS_PERMISSION = #{searchIsPermission}
+		</if>
+		<if test="searchIsDelete != null">
+			AND II.IS_DELETE = #{searchIsDelete}
+		</if>
+	</sql>
+	<sql id="searchOrder">
+		II.INVITE_NO DESC
+	</sql>
+	
+	<!-- ============================================================= -->
+	<!-- Search                                                        -->
+	<!-- ============================================================= -->
+	
+	 <select id="list" parameterType="com.cNerds.dailyMoment.invite.dto.InviteInfoCriterion" resultMap ="resultMap">
+		SELECT <include refid="columns"/>
+		FROM <include refid="tables"/>
+		<where>
+			<include refid="searchCriterion"/>
+		</where>
+		ORDER BY <include refid="searchOrder"/>		
+	</select>
+	
+	<select id="detail" parameterType="com.cNerds.dailyMoment.invite.dto.InviteInfo" resultMap ="resultMap">
+		SELECT <include refid="columns"/>
+		FROM <include refid="tables"/>
+		<where>
+			<include refid="keyCriterion"/>
+		</where>
+	</select>
+ 
+
+	<!-- ============================================================= -->
+	<!-- Insert / Update / Delete                                      -->
+	<!-- ============================================================= -->
+	<insert id="insert" parameterType="com.cNerds.dailyMoment.invite.dto.InviteInfo">
+		<selectKey keyProperty="inviteNo" resultType="Integer" order="BEFORE"> 
+			SELECT IFNULL(MAX(INVITE_NO), 0)+1 inviteNo FROM B_INVITE_INFO 
+		</selectKey>
+		 
+		INSERT INTO B_INVITE_INFO
+		(
+			INVITE_NO
+			, FAMILY_NO
+			, FAMILY_RELATION
+			, EMAIL
+			, AUTH_CODE
+			, IS_PERMISSION
+			, IS_DELETE
+			, CREATE_ON
+			, CREATOR
+						
+			
+		)
+		VALUES
+		(
+			#{inviteNo}			
+			, #{familyNo}
+			, #{familyRelation}
+			, #{email}
+			, #{authCode}
+			, #{isPermission}
+			, #{isDelete}
+			, NOW()			
+			, #{creator.userNo}					
+		)
+	</insert>
+		
+	<update id="update" parameterType="com.cNerds.dailyMoment.invite.dto.InviteInfo">
+		UPDATE 
+			B_INVITE_INFO II
+		SET
+			FAMILY_NO						=			#{familyNo}
+			, FAMILY_RELATION				=			#{familyRelation}
+			, EMAIL							=			#{email}
+			, AUTH_CODE						=			#{authCode}
+			, IS_PERMISSION					=			#{isPermission}
+			, IS_DELETE						=			#{isDelete}
+			, MODIFIED_ON					=			NOW()
+			, MODIFIER						=			#{modifier.userNo}
+		<where>
+		 <include refid="keyCriterion"/>
+		</where>
+	</update>
+	
+	<update id="inviteApprove" parameterType="com.cNerds.dailyMoment.invite.dto.InviteInfo">
+		UPDATE 
+			B_INVITE_INFO II
+		SET
+			, IS_PERMISSION					=			#{isPermission}
+			, MODIFIED_ON					=			NOW()
+		<where>
+		 <include refid="keyCriterion"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="com.cNerds.dailyMoment.invite.dto.InviteInfo">
+		DELETE FROM II USING B_INVITE_INFO II
+			<where>
+		 	<include refid="keyCriterion"/>
+		 </where>
+	</delete>
+	
+	
+	
+	
+	
+	
+</mapper>

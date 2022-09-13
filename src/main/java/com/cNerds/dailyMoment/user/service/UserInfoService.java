@@ -1,28 +1,17 @@
 package com.cNerds.dailyMoment.user.service;
 
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
-
-import com.cNerds.dailyMoment.core.service.GenericServiceImpl;
-import com.cNerds.dailyMoment.user.UserInfo;
-import com.cNerds.dailyMoment.user.UserInfoCriterion;
+import com.cNerds.dailyMoment.core.service.GenericService;
 import com.cNerds.dailyMoment.user.dao.UserInfoDao;
+import com.cNerds.dailyMoment.user.dto.UserInfo;
+import com.cNerds.dailyMoment.user.dto.UserInfoCriterion;
 
-import lombok.RequiredArgsConstructor;
+public interface UserInfoService extends GenericService<UserInfo, UserInfoCriterion, UserInfoDao> {
 
-@RequiredArgsConstructor
-@Service
-public class UserInfoService extends GenericServiceImpl<UserInfo, UserInfoCriterion, UserInfoDao> implements UserDetailsService {
+	UserInfo userCheck(String userId);
 
-    //private final UserRepository userRepository;
+	UserInfo refreshTokenCheck(String refreshAuthToken);
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    	UserInfo test = new UserInfo();
-        return test;
-        
+	void updateAuthToken(UserInfo tokenUserInfo, UserInfo tokenUserInfo2);
+    
 
-    }
 }

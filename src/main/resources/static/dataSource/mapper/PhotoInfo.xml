@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.cNerds.dailyMoment.photo.dto.PhotoInfo">
+	
+	<!-- ============================================================= -->
+	<!-- resultMap                                                     -->
+	<!-- ============================================================= -->
+	<resultMap type="com.cNerds.dailyMoment.photo.dto.PhotoInfo" id="resultMap">
+		<id property="photoNo"					column="PHOTO_NO"/>
+		<result property="childrenNo"			column="CHILDREN_NO" />
+		<result property="imageName"			column="IMAGE_NAME" />
+		<result property="photoDate"			column="PHOTO_DATE" />
+		<result property="latitude"				column="LATITUDE" />
+		<result property="hardness"				column="HARDNESS" />
+		<result property="comment"				column="COMMENT" />
+		<result property="isMain"				column="IS_MAIN" />
+		<result property="createOn" 			column="CREATE_ON"/>
+		<result property="creator.userNo" 		column="CREATOR"/>
+		<result property="modifiedOn" 			column="MODIFIED_ON"/>
+		<result property="modifier.userNo" 		column="MODIFIER"/>
+	</resultMap>
+	
+	<!-- ============================================================= -->
+	<!-- Query Fragment                                                -->
+	<!-- ============================================================= -->
+	<sql id="columns">
+		PI.PHOTO_NO, PI.CHILDREN_NO, PI.IMAGE_NAME, PI.PHOTO_DATE, 
+		PI.LATITUDE, PI.HARDNESS, PI.COMMENT, PI.IS_MAIN,
+		PI.CREATE_ON, PI.CREATOR, PI.MODIFIED_ON, PI.MODIFIER
+  	    
+	</sql>
+	<sql id="tables">
+		B_PHOTO_INFO PI
+	</sql>
+	<sql id="keyCriterion">
+		PI.PHOTO_NO = #{photoNo}
+	</sql>
+	
+	<sql id="searchCriterion">
+		<if test="searchPhotoNo != null">
+			AND PI.PHOTO_NO = #{searchPhotoNo}
+		</if>
+		<if test="searchPhotoDate != null and searchPhotoDate != ''">
+			AND PI.PHOTO_DATE = #{searchPhotoDate}
+		</if>
+		<if test="searchLikePhotoUserNo != null">
+			AND PI.PHOTO_NO IN (
+				SELECT PHOTO_NO
+				FROM B_LIKE_INFO
+				WHERE CREATOR = #{searchLikePhotoUserNo}
+				AND PHOTO_NO != 0
+			)
+		</if>
+	</sql>
+	<sql id="searchOrder">
+		PI.PHOTO_NO DESC
+	</sql>
+	
+	<!-- ============================================================= -->
+	<!-- Search                                                        -->
+	<!-- ============================================================= -->
+	
+	 <select id="list" parameterType="com.cNerds.dailyMoment.photo.dto.PhotoInfoCriterion" resultMap ="resultMap">
+		SELECT <include refid="columns"/>
+		FROM <include refid="tables"/>
+		<where>
+			<include refid="searchCriterion"/>
+		</where>
+		ORDER BY <include refid="searchOrder"/>		
+	</select>
+	
+	<select id="detail" parameterType="com.cNerds.dailyMoment.photo.dto.PhotoInfo" resultMap ="resultMap">
+		SELECT <include refid="columns"/>
+		FROM <include refid="tables"/>
+		<where>
+			<include refid="keyCriterion"/>
+		</where>
+	</select>
+	
+	<select id="searchPhotoFamilyNo" parameterType="Integer" resultType ="Integer">
+		SELECT IFNULL(MAX(FI.FAMILY_NO),0)
+		FROM 
+			B_PHOTO_INFO PI 
+			JOIN B_CHILDREN_INFO CI ON PI.CHILDREN_NO = CI.CHILDREN_NO
+			JOIN B_FAMILY_INFO FI ON CI.FAMILY_NO = FI.FAMILY_NO
+		WHERE 
+			PI.PHOTO_NO = #{photoNo}
+	</select>
+	
+	<select id="searchMaxPhotoNo" resultType ="Integer">
+		SELECT IFNULL(MAX(PHOTO_NO),0)
+		FROM
+		 	B_PHOTO_INFO
+	</select>  
+
+	<!-- ============================================================= -->
+	<!-- Insert / Update / Delete                                      -->
+	<!-- ============================================================= -->
+	<insert id="insert" parameterType="com.cNerds.dailyMoment.photo.dto.PhotoInfo">
+		<selectKey keyProperty="photoNo" resultType="Integer" order="BEFORE"> 
+			SELECT IFNULL(MAX(PHOTO_NO), 0)+1 photoNo FROM B_PHOTO_INFO 
+		</selectKey>
+		 
+		INSERT INTO B_PHOTO_INFO
+		(
+			PHOTO_NO
+			, CHILDREN_NO
+			, IMAGE_NAME
+			, PHOTO_DATE
+			, LATITUDE
+			, HARDNESS
+			, COMMENT
+			, IS_MAIN
+			, CREATE_ON
+			, CREATOR
+						
+			
+		)
+		VALUES
+		(
+			#{photoNo}			
+			, #{childrenNo}
+			, #{imageName}
+			, #{photoDate}
+			, #{latitude}
+			, #{hardness}
+			, #{comment}
+			, #{isMain}
+			, NOW()			
+			, #{creator.userNo}					
+		)
+	</insert>
+		
+	<update id="update" parameterType="com.cNerds.dailyMoment.photo.dto.PhotoInfo">
+		UPDATE 
+			B_PHOTO_INFO PI
+		SET
+			CHILDREN_NO					=			#{childrenNo}
+			, IMAGE_NAME				=			#{imageName}
+			, PHOTO_DATE				=			#{photoDate}
+			, LATITUDE					=			#{latitude}
+			, HARDNESS					=			#{hardness}
+			, COMMENT					=			#{comment}
+			, IS_MAIN					=			#{isMain}
+			, MODIFIED_ON				=			NOW()
+			, MODIFIER					=			#{modifier.userNo}
+		<where>
+		 <include refid="keyCriterion"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="com.cNerds.dailyMoment.photo.dto.PhotoInfo">
+		DELETE FROM PI USING B_PHOTO_INFO PI
+			<where>
+		 	<include refid="keyCriterion"/>
+		 </where>
+	</delete>
+	
+	
+	
+	
+	
+	
+</mapper>

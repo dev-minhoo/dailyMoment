@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.cNerds.dailyMoment.reply.dto.ReplyInfo">
+	
+	<!-- ============================================================= -->
+	<!-- resultMap                                                     -->
+	<!-- ============================================================= -->
+	<resultMap type="com.cNerds.dailyMoment.reply.dto.ReplyInfo" id="resultMap">
+		<id property="replyNo"						column="REPLY_NO"/>
+		<result property="photoNo"					column="PHOTO_NO" />
+		<result property="parentReplyNo"			column="PARENT_REPLY_NO" />
+		<result property="comment"					column="COMMENT" />
+		<result property="createOn" 				column="CREATE_ON"/>
+		<result property="creator.userNo" 			column="CREATOR"/>
+		<result property="modifiedOn" 				column="MODIFIED_ON"/>
+		<result property="modifier.userNo" 			column="MODIFIER"/>
+	</resultMap>
+	
+	<!-- ============================================================= -->
+	<!-- Query Fragment                                                -->
+	<!-- ============================================================= -->
+	<sql id="columns">
+		RI.REPLY_NO, RI.PHOTO_NO, RI.PARENT_REPLY_NO, RI.COMMENT,	
+		RI.CREATE_ON, RI.CREATOR, RI.MODIFIED_ON, RI.MODIFIER	    
+	</sql>
+	<sql id="tables">
+		B_REPLY_INFO RI
+		
+	</sql>
+	<sql id="keyCriterion">
+		RI.REPLY_NO = #{replyNo}
+	</sql>
+	
+	<sql id="searchCriterion">
+		<if test="searchPhotoNo != null">
+			AND RI.PHOTO_NO = #{searchPhotoNo}
+			AND RI.PARENT_REPLY_NO = 0
+		</if>
+		<if test="searchParentReplyNo != null">
+			AND RI.PARENT_REPLY_NO = #{searchParentReplyNo}
+		</if>
+				
+	</sql>
+	<sql id="searchOrder">
+		RI.REPLY_NO DESC
+	</sql>
+	
+	<!-- ============================================================= -->
+	<!-- Search                                                        -->
+	<!-- ============================================================= -->
+	
+	 <select id="list" parameterType="com.cNerds.dailyMoment.reply.dto.ReplyInfoCriterion" resultMap ="resultMap">
+		SELECT <include refid="columns"/>
+		FROM <include refid="tables"/>
+		<where>
+			<include refid="searchCriterion"/>
+		</where>
+		ORDER BY <include refid="searchOrder"/>		
+	</select>
+	
+	<select id="detail" parameterType="com.cNerds.dailyMoment.reply.dto.ReplyInfo" resultMap ="resultMap">
+		SELECT <include refid="columns"/>
+		FROM <include refid="tables"/>
+		<where>
+			<include refid="keyCriterion"/>
+		</where>
+	</select>
+	
+	
+	<select id="searchReplyFamilyNo" parameterType="Integer" resultType ="Integer">
+		SELECT IFNULL(MAX(FI.FAMILY_NO),0)
+		FROM
+		 	B_REPLY_INFO RI 
+			JOIN B_PHOTO_INFO PI ON RI.PHOTO_NO = PI.PHOTO_NO
+			JOIN B_CHILDREN_INFO CI ON PI.CHILDREN_NO = CI.CHILDREN_NO
+			JOIN B_FAMILY_INFO FI ON CI.FAMILY_NO = FI.FAMILY_NO
+		WHERE 
+			RI.REPLY_NO = #{replyNo}
+	</select>
+	
+	<!-- ============================================================= -->
+	<!-- Insert / Update / Delete                                      -->
+	<!-- ============================================================= -->
+	<insert id="insert" parameterType="com.cNerds.dailyMoment.reply.dto.ReplyInfo">
+		<selectKey keyProperty="replyNo" resultType="Integer" order="BEFORE"> 
+			SELECT IFNULL(MAX(REPLY_NO), 0)+1 replyNo FROM B_REPLY_INFO 
+		</selectKey>
+		 
+		INSERT INTO B_REPLY_INFO
+		(
+			REPLY_NO
+			, PHOTO_NO
+			, PARENT_REPLY_NO
+			, COMMENT
+			, CREATE_ON
+			, CREATOR
+						
+			
+		)
+		VALUES
+		(
+			#{replyNo}			
+			, #{photoNo}
+			, #{parentReplyNo}
+			, #{comment}		
+			, NOW()			
+			, #{creator.userNo}					
+		)
+	</insert>
+		
+	<update id="update" parameterType="com.cNerds.dailyMoment.reply.dto.ReplyInfo">
+		UPDATE 
+			B_REPLY_INFO RI
+		SET
+			PHOTO_NO					=			#{photoNo}
+			, PARENT_REPLY_NO			=			#{parentReplyNo}
+			, COMMENT					=			#{comment}
+			, MODIFIED_ON				=			NOW()
+			, MODIFIER					=			#{modifier.userNo}
+		<where>
+		 <include refid="keyCriterion"/>
+		</where>
+	</update>
+	
+	<delete id="delete" parameterType="com.cNerds.dailyMoment.reply.dto.ReplyInfo">
+		DELETE FROM RI USING B_REPLY_INFO RI
+			<where>
+		 	<include refid="keyCriterion"/>
+		 </where>
+	</delete>
+	
+	
+	
+	
+	
+	
+</mapper>

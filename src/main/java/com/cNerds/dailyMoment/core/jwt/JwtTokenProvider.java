@@ -2,16 +2,19 @@ package com.cNerds.dailyMoment.core.jwt;
 
 import java.util.Base64;
 import java.util.Date;
-import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
+
+import com.cNerds.dailyMoment.user.dto.UserInfo;
+import com.cNerds.dailyMoment.user.service.UserInfoService;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -22,12 +25,18 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Component
 public class JwtTokenProvider {
-    private String secretKey = "cNerdsDailyMomentSecretKey";
+    private String secretKey = "cNerdsDailyMomentSK";
 
-    // 토큰 유효시간 30분
-    private long tokenValidTime = 30 * 60 * 1000L;
+    // 토큰 유효시간 1시간
+    private long accessTokenValidTime = 1000L * 60 * 60;
+    
+    // 토큰 유효시간 1일
+    private long refreshTokenValidTime = 1000L * 60 * 60 * 24;
 
     private final UserDetailsService userDetailsService;
+    
+    @Autowired
+	private UserInfoService userInfoService;
 
     // 객체 초기화, secretKey를 Base64로 인코딩한다.
     @PostConstruct
@@ -36,18 +45,52 @@ public class JwtTokenProvider {
     }
 
     // JWT 토큰 생성 
-    public String createToken(String userPk, List<String> roles) {
-        Claims claims = Jwts.claims().setSubject(userPk); // JWT payload 에 저장되는 정보단위, 보통 여기서 user를 식별하는 값을 넣는다.
-        claims.put("roles", roles); // 정보는 key / value 쌍으로 저장된다.
+    public JwtAuthToken createToken(String userId, String roles) {
+        
+        Claims claims = Jwts.claims().setSubject(userId); // JWT payload 에 저장되는 정보단위
+        //claims.put("roles", roles); // 정보는 key / value 쌍으로 저장된다.
         Date now = new Date();
-        return Jwts.builder()
+
+        //Access Token
+        String accessToken = Jwts.builder()
                 .setClaims(claims) // 정보 저장
                 .setIssuedAt(now) // 토큰 발행 시간 정보
-                .setExpiration(new Date(now.getTime() + tokenValidTime)) // set Expire Time
+                .setExpiration(new Date(now.getTime() + accessTokenValidTime)) // set Expire Time
                 .signWith(SignatureAlgorithm.HS256, secretKey)  // 사용할 암호화 알고리즘과
                 // signature 에 들어갈 secret값 세팅
                 .compact();
+
+        //Refresh Token
+        String refreshToken =  Jwts.builder()
+        		.setClaims(claims) // 정보 저장
+                .setIssuedAt(now) // 토큰 발행 시간 정보
+                .setExpiration(new Date(now.getTime() + refreshTokenValidTime)) // set Expire Time
+                .signWith(SignatureAlgorithm.HS256, secretKey)  // 사용할 암호화 알고리즘과
+                // signature 에 들어갈 secret값 세팅
+                .compact();
+        
+        
+        return JwtAuthToken.builder().accessAuthToken(accessToken).refreshAuthToken(refreshToken).key(userId).build();
     }
+    
+    
+    public UserInfo refreshTokenUserCheck(String refreshAuthToken) {
+    	
+    	
+		UserInfo refreshTokenUserCheck = userInfoService.refreshTokenCheck(refreshAuthToken);
+		return refreshTokenUserCheck;
+	}
+    
+    // refreshToken을 이용한 재발행
+    public JwtAuthToken reCreateToken(UserInfo tokenUserInfo) {
+    	JwtAuthToken token = new JwtAuthToken();
+    	token = this.createToken(tokenUserInfo.getUserId(),"test");
+		tokenUserInfo.setUserAuthCheckToken(token.getRefreshAuthToken());
+		userInfoService.updateAuthToken(tokenUserInfo,tokenUserInfo);
+		return token;
+	}
+    
+    
 
     // JWT 토큰에서 인증 정보 조회
     public Authentication getAuthentication(String token) {
@@ -60,18 +103,25 @@ public class JwtTokenProvider {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
 
-    // Request의 Header에서 token 값을 가져옵니다. "Authorization" : "TOKEN값'
-    public String resolveToken(HttpServletRequest request) {
-        return request.getHeader("Authorization");
+    // Request의 Header에서 accessToken 값을 가져옵니다. 
+    public String resolveAccessToken(HttpServletRequest request) {
+        return request.getHeader("accessAuthToken");
+    }
+    
+    // Request의 Header에서 refleshToken 값을 가져옵니다.
+    public String resolveRefreshToken(HttpServletRequest request) {
+        return request.getHeader("refreshAuthToken");
     }
 
     // 토큰의 유효성 + 만료일자 확인
     public boolean validateToken(String jwtToken) {
         try {
-            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
+            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);    
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
             return false;
         }
     }
+
+	
 }
